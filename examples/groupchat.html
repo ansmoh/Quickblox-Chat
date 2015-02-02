@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>QB Web Chat sample - Group chat room</title>
+	
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+	<section id="wrap">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Public Room</h3>
+				<button type="button" id="logout" class="btn tooltip-title" data-toggle="tooltip" data-placement="bottom" title="Exit">
+					<span class="glyphicon glyphicon-log-out"></span>
+				</button>
+			</div>
+			<div class="chat panel-body">
+				<div class="chat-user-list list-group"></div>
+				<div class="chat-content">
+					<div class="messages"></div>
+					<form action="#" class="controls">
+						<div class="input-group">
+							 <input type="text" class="form-control" placeholder="Enter your message here..">
+							 <span class="input-group-btn">
+								 <button type="submit" class="sendMessage btn btn-primary">Send</button>
+							 </span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div><!-- .panel -->
+	</section><!-- #wrap -->
+	
+	<section id="loginForm" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Group Chat Room<br>
+						<a href="http://quickblox.com" target="_blank"><img src="../images/qb_logo.png" alt="quickblox logo">by QuickBlox</a>
+					</h3>
+				</div>
+				<div class="modal-body">
+					<form action="#">
+						<div class="form-group">
+							<input type="text" id="nickname" class="form-control" placeholder="Enter nickname" autofocus>
+						</div>
+						<button type="submit" id="login" class="btn btn-primary btn-block">Connect</button>
+					</form>
+					
+					<div class="progress progress-striped active">
+						<div class="progress-bar"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	
+	<script src="../libs/quickblox.js"></script>
+	<script src="../libs/quickblox.chat.js"></script>
+	<script src="../libs/jquery.timeago.js"></script>
+	<script src="../libs/jquery.scrollTo-min.js"></script>
+	
+	<script src="../config.js"></script>
+	<script src="../js/helpers.js"></script>
+	
+	<script src="groupchat.js"></script>
+</body>
+</html>
