@@ -8,8 +8,7 @@
     }
 
     include('config.php');
-
-echo '
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,10 +90,10 @@ echo '
 	<script src="chat.js"></script>
 
 	<script>
-        var _OPPONENTUSERID = '.$OppId.';
+        var _OPPONENTUSERID = <?php echo $OppId?>;
         $(document).ready(function() {
             // Web SDK initialization
-            QB.init("'.$QBAPPID.'", "'.$QBAPPAuthKey.'", "'.$QBAPPAuthSecret.'");
+            QB.init(<?php echo $QBAPPID?>, "<?php echo $QBAPPAuthKey?>", "<?php echo $QBAPPAuthSecret?>");
             
             // QuickBlox session creation
             QB.createSession(function(err, result) {
@@ -108,7 +107,7 @@ echo '
                     updateTime();
 					
                     // events
-                    login("'.$username.'","'.$pwd.'");
+                    login("<?php echo $username?>","<?php echo $pwd?>");
                     $("#logout").click(logout);
                     $(".attach").on("click", ".close", closeFile);
                     $(".chat input:text").keydown(startTyping);
@@ -126,6 +125,3 @@ echo '
 
 </body>
 </html>
-';
-
-?>

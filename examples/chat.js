@@ -222,17 +222,7 @@ function _onMessages(err, res){
 function _onDialogs(err, res){
 	
 	if (!err) {		
-		var optsStr = "";
-		$.each(res.items, function(i, obj){
-			var occupantsIds = $.grep(obj.occupants_ids, function(id){
-				return id != obj.user_id;
-			});
-			optsStr = "Users: " + occupantsIds.join(",");
-			optsStr = optsStr + " -> Last Message: " + obj.last_message;
-			var $option =  $("<option></option>").text(optsStr).data("dialogId",obj._id);
-			$("#history-list").append($option);
-		});
-	
+
 		$("#history-list").on("change", function(e){
 			$("#load-chat-history-wrapper").show();		
 		});
@@ -249,6 +239,23 @@ function _onDialogs(err, res){
 				showChatBox();
 			}
 		});
+		
+		var optsStr = "";
+		$.each(res.items, function(i, obj){
+			var occupantsIds = $.grep(obj.occupants_ids, function(id){
+				return id != obj.user_id;
+			});
+			optsStr = "Users: " + occupantsIds.join(",");
+			optsStr = optsStr + " -> Last Message: " + obj.last_message;
+			var $option =  $("<option></option>").text(optsStr).data("dialogId",obj._id);
+			$("#history-list").append($option);
+
+			$("select#history-list").prop('selectedIndex', 0);
+
+			$( "#startChat" ).trigger( "click" );
+		});
+	
+		
 	} // err
 }
 
