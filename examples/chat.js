@@ -1,50 +1,20 @@
-var params, chatUser, chatService, recipientID;
+var params, chatUser, chatService, recipientID, chatType;
 
-// Storage QB user ids by their logins
-var users = {
-	Quick: '999190',
-	Blox: '978816'
-};
 
-$(document).ready(function() {
-	// Web SDK initialization
-	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
-	
-	// QuickBlox session creation
-	QB.createSession(function(err, result) {
-		if (err) {
-			console.log(err.detail);
-		} else {
-			$('#loginForm').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
-			
-			$('.tooltip-title').tooltip();
-			changeInputFileBehavior();
-			updateTime();
-			
-			// events
-			$('#loginForm button').click(login);
-			$('#logout').click(logout);
-			$('.attach').on('click', '.close', closeFile);
-			$('.chat input:text').keydown(startTyping);
-			$('.sendMessage').click(makeMessage);
-		}
-	});
-	
-	window.onresize = function() {
-		changeHeightChatBlock();
-	};
-});
+function setLoading(show){
+	if (show) {
+		$("#waitdlg").modal({ backdrop: "static" });
+	} else {
+		$("#waitdlg").modal("hide");
+	}
+}
 
-function login() {
-	$('#loginForm button').hide();
-	$('#loginForm .progress').show();
+function login(_login,_password) {
+	$("#load-chat-history").prop("checked", true);
 	
 	params = {
-		login: $(this).val(),
-		password: '123123123' // default password
+		login: _login,
+		password: _password
 	};
 	
 	// chat user authentication
@@ -101,7 +71,7 @@ function startTyping() {
 }
 
 function stopTyping() {
-	if (!chatUser.isTyping) return true;
+	if ((!chatUser) || (!chatUser.isTyping)) return true;
 	
 	var message = {
 		state: 'paused',
@@ -155,7 +125,8 @@ function sendMessage(text, fileName, fileUID) {
 		body: text,
 		type: 'chat',
 		extension: {
-			nick: chatUser.login
+			nick: chatUser.login,
+			save_to_history: 1
 		}
 	};
 	
@@ -202,36 +173,108 @@ function logout() {
 	chatService.disconnect();
 }
 
-/* Callbacks
-----------------------------------------------------------*/
-function onConnectFailed() {
-	$('#loginForm .progress').hide();
-	$('#loginForm button').show();
-}
-
-function onConnectSuccess() {
-	var opponent = chooseOpponent(chatUser.login);
-	
-	$('#loginForm').modal('hide');
+function showChatBox(){
+	$('#wraphistory').hide();
 	$('#wrap').show();
-	$('.panel-title .opponent').text(opponent);
-	$('.chat .chat-user-list').html('<li class="list-group-item"><span class="glyphicon glyphicon-user"></span> ' + opponent + '</li>');
-	$('.chat .messages').empty();
+	$('.panel-title .opponent').text(_OPPONENTUSERID);
+	$('.chat .chat-user-list').html('<li class="list-group-item"><span class="glyphicon glyphicon-user"></span> ' + _OPPONENTUSERID + '</li>');		
+	
 	$('.chat input:text').focus().val('');
 	changeHeightChatBlock();
 	
-	recipientID = users[opponent];
+	recipientID = _OPPONENTUSERID;
 	
 	// create a timer that will send presence each 60 seconds
 	chatService.startAutoSendPresence(60);
 }
 
-function onConnectClosed() {
-	$('#wrap').hide();
-	$('#loginForm').modal('show');
-	$('#loginForm .progress').hide();
-	$('#loginForm button').show();
+function _onMessages(err, res){
+	if (!err) {
+		$('.chat .messages').empty();
+		$.each(res.items, function(i, obj){
+			if (obj.message) {
+				var message = {
+					body: obj.message,
+					type: 'chat',
+					datetime: new Date(obj.date_sent*1000),
+					extension: {
+						nick: obj.nick
+					}
+				};			
+				
+				// TODO: display attachments
+				/*
+				if ((obj.attachments.length) && (fileUID)) {
+					message.extension.fileName = fileName;
+					message.extension.fileUID = fileUID;
+				}
+				*/
+				
+				// function showMessage(body, time, extension) {
+				showMessage(message.body, message.datetime.toISOString(), message.extension);
+			}
+		});
+		
+		showChatBox();
+	}
+}
+
+function _onDialogs(err, res){
 	
+	if (!err) {		
+		var optsStr = "";
+		$.each(res.items, function(i, obj){
+			var occupantsIds = $.grep(obj.occupants_ids, function(id){
+				return id != obj.user_id;
+			});
+			optsStr = "Users: " + occupantsIds.join(",");
+			optsStr = optsStr + " -> Last Message: " + obj.last_message;
+			var $option =  $("<option></option>").text(optsStr).data("dialogId",obj._id);
+			$("#history-list").append($option);
+		});
+	
+		$("#history-list").on("change", function(e){
+			$("#load-chat-history-wrapper").show();		
+		});
+		
+		$("#startChat").on("click", function(e){
+			var $options = $("#history-list option:selected"),
+				dlg_id = $options.data("dialogId");
+			
+			var loadHistory = $("#load-chat-history").prop("checked");
+			if (loadHistory) {
+				QB.chat.message.list({chat_dialog_id: dlg_id}, _onMessages);
+			} else {
+				$('.chat .messages').empty();
+				showChatBox();
+			}
+		});
+	} // err
+}
+
+function getAllDialogsCurrUser(){
+	QB.chat.dialog.list({limit: 50}, _onDialogs);
+}
+
+/* Callbacks
+----------------------------------------------------------*/
+function onConnectFailed() {
+	setLoading(false);
+}
+
+function onConnectSuccess() {
+	setLoading(false);
+	$('#wraphistory').show();
+	$('.currentUser','#wraphistory').text(chatUser.login);
+		
+	// get all dialogs of current user
+	getAllDialogsCurrUser();	
+}
+
+function onConnectClosed() {
+	var location = window.location.pathname.split("/").slice(0,-1);
+	location = window.location.origin + location.join("/");
+	window.location.href = location + '/index.html';
 	chatUser = null;
 	chatService = null;
 }

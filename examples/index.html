@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>QB Web Chat sample - One to One chat</title>
+	
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+	<section id="loginForm" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content" style="margin-top: -100px;">
+				<div class="modal-header">
+					<h3 class="modal-title">One to One chat<br>
+						<a href="http://quickblox.com" target="_blank"><img src="../images/qb_logo.png" alt="quickblox logo">by QuickBlox</a>
+					</h3>
+				</div>
+				<div class="modal-body">
+				
+				<form role="form" action="chat.php" method="POST">
+				  <div class="form-group">
+					<label for="username">User:</label>
+					<input type="text" class="form-control" id="username" name="username" value="ansmoh_user">
+				  </div>
+				  <div class="form-group">
+					<label for="pwd">Password:</label>
+					<input type="password" class="form-control" name="pwd" id="pwd" value="123456789">
+				  </div>
+				  <div class="form-group">
+					<label for="opid">Opponent ID:</label>
+					<input type="text" class="form-control" name="opid" id="opid" value="2279141">
+				  </div>				  				 
+				  
+				  <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>				  
+				</form>									
+					<div class="qb-progress progress-striped active">
+						<div class="progress-bar"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	
+	<script>
+        $(document).ready(function() {
+			$("#loginForm").modal({
+				backdrop: "static",
+				keyboard: false
+			});	
+		});
+	</script>
+
+</body>
+</html>
